@@ -1,0 +1,9 @@
+# Force YAML files to be counted as Ansible
+*.yml linguist-language=Ansible
+*.yaml linguist-language=Ansible
+
+# Treat Ansible config as INI (optional, usually auto-detected)
+ansible.cfg linguist-language=INI
+
+# Exclude Jinja2 templates from language statistics so they don't dominate
+*.j2 linguist-detectable=false
