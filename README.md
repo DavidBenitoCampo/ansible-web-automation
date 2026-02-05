@@ -97,3 +97,37 @@ You should see a custom confirming page with the server's hostname and deploymen
 - **Variables & Templating**: Using `group_vars` and Jinja2 for dynamic configuration.
 - **Handler Management**: Efficient service restarts (Nginx only restarts on config changes).
 - **Environment Abstraction**: The same playbook runs on Docker or Real VMs by just swapping the inventory file.
+
+---
+
+## 🛡 Security Audit
+
+This project includes a built-in security audit script using [Docker Bench for Security](https://github.com/docker/docker-bench-security). This tool checks for dozens of common best-practices around deploying Docker containers in production.
+
+### Running the Audit
+To audit your current container configuration, run:
+```bash
+./scripts/security_audit.sh
+```
+
+**Note:** This is a portfolio demo environment, so some security warnings (like "Running as root" or "Missing Healthcheck") are expected as we prioritize simplicity over strict production hardening.
+
+---
+
+## 🦅 Runtime Security (Falco)
+
+Falco is running in the background to detect anomalous behavior in real-time.
+
+### Viewing Security Alerts
+To see live security alerts:
+```bash
+docker logs -f falco
+```
+
+### Triggering a Test Alert
+To simulate a security incident (e.g., a "sensitive file read" attempt), run this command:
+```bash
+# This attempts to read /etc/shadow inside the container (Falco will catch this)
+docker exec -it web1 cat /etc/shadow
+```
+*Check the Falco logs again, and you should see a `Notice` or `Warning` about the sensitive file read.*

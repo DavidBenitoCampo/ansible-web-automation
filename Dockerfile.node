@@ -25,4 +25,8 @@ RUN chown -R ubuntu:root /home/ubuntu/.ssh && \
 # Expose SSH port
 EXPOSE 22
 
+# Add Healthcheck to verify SSH is responding
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+    CMD nc -z localhost 22 || exit 1
+
 CMD ["/usr/sbin/sshd", "-D"]
