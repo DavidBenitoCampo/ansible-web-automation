@@ -1,0 +1,28 @@
+FROM ubuntu:22.04
+
+# Install SSH and Python (required for Ansible)
+RUN apt-get update && apt-get install -y \
+    openssh-server \
+    python3 \
+    sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+# Configure SSH
+RUN mkdir /var/run/sshd
+
+# Create ubuntu user (standard for EC2/Ubuntu cloud images)
+RUN useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u 1000 ubuntu
+RUN echo 'ubuntu:password' | chpasswd
+RUN echo 'ubuntu ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+# Set up SSH access for ubuntu user
+RUN mkdir -p /home/ubuntu/.ssh
+COPY keys/ansible_id_rsa.pub /home/ubuntu/.ssh/authorized_keys
+RUN chown -R ubuntu:root /home/ubuntu/.ssh && \
+    chmod 700 /home/ubuntu/.ssh && \
+    chmod 600 /home/ubuntu/.ssh/authorized_keys
+
+# Expose SSH port
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]

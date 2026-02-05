@@ -1,0 +1,90 @@
+---
+- name: Install Nginx
+  package:
+    name: nginx
+    state: present
+
+- name: Ensure Nginx is enabled
+  service:
+    name: nginx
+    enabled: yes
+    state: started
+
+- name: Create application user
+  user:
+    name: "{{ app_user }}"
+    group: "{{ app_group }}"
+    system: yes
+    create_home: yes
+    home: "{{ app_directory }}"
+
+- name: Create SSL directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ ssl_cert_path }}"
+    - "{{ ssl_key_path }}"
+
+- name: Check if SSL cert exists
+  stat:
+    path: "{{ ssl_cert_path }}/{{ ssl_cert_file }}"
+  register: ssl_cert_check
+
+- name: Generate self-signed SSL certificate
+  command: >
+    openssl req -new -nodes -x509
+    -subj "/C=US/ST=Demo/L=Internet/O=IT/CN={{ server_name }}"
+    -days 365
+    -keyout {{ ssl_key_path }}/{{ ssl_key_file }}
+    -out {{ ssl_cert_path }}/{{ ssl_cert_file }}
+  when: not ssl_cert_check.stat.exists
+  notify: restart nginx
+
+- name: Set SSL permissions
+  file:
+    path: "{{ item.path }}"
+    mode: "{{ item.mode }}"
+    owner: root
+    group: root
+  loop:
+    - { path: "{{ ssl_cert_path }}/{{ ssl_cert_file }}", mode: '0644' }
+    - { path: "{{ ssl_key_path }}/{{ ssl_key_file }}", mode: '0600' }
+  when: not ssl_cert_check.stat.exists
+
+- name: Create document root
+  file:
+    path: "{{ document_root }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+
+- name: Deploy Nginx Configuration
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/{{ app_name }}
+    mode: '0644'
+  notify: reload nginx
+
+- name: Enable Nginx Configuration
+  file:
+    src: /etc/nginx/sites-available/{{ app_name }}
+    dest: /etc/nginx/sites-enabled/{{ app_name }}
+    state: link
+  notify: reload nginx
+
+- name: Remove default Nginx config
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: reload nginx
+
+- name: Deploy Index Page
+  template:
+    src: index.html.j2
+    dest: "{{ document_root }}/index.html"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0644'

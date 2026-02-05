@@ -1,0 +1,19 @@
+# Ansible
+*.retry
+*.log
+inventory/hosts.yml
+
+# SSH Keys (Local Demo)
+keys/
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store

@@ -1,0 +1,43 @@
+---
+- name: Update package cache (Debian/Ubuntu)
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_os_family == "Debian"
+
+- name: Install common packages
+  package:
+    name:
+      - curl
+      - wget
+      - unzip
+      - openssl
+      - ca-certificates
+      - git
+      - htop
+    state: present
+
+- name: Ensure sudo group exists
+  group:
+    name: sudo
+    state: present
+
+# Skipping UFW enable here because it might lock us out in Docker if not careful.
+# Keeping it simple for the demo, or we can enable it but ensure ssh is allowed first.
+# For Docker simplicity, we often skip firewall inside containers, but for "realism" we can include it conditionally.
+
+- name: Install UFW
+  package:
+    name: ufw
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Check if running in Docker
+  stat:
+    path: /.dockerenv
+  register: is_docker
+
+- name: Configure basics if not Docker (e.g. Hostname)
+  hostname:
+    name: "{{ inventory_hostname }}"
+  when: not is_docker.stat.exists

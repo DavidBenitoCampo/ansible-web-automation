@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ansible Automation Demo</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { color: #2c3e50; }
+        p { color: #7f8c8d; }
+        .server-info { margin-top: 30px; padding: 20px; background: #ecf0f1; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ansible Automation Worked!</h1>
+        <p>This server was configured automatically using Ansible.</p>
+        
+        <div class="server-info">
+            <p><strong>Configured for:</strong> {{ server_name }}</p>
+            <p><strong>Deployed at:</strong> {{ ansible_date_time.iso8601 }}</p>
+        </div>
+    </div>
+</body>
+</html>

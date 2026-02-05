@@ -1,0 +1,15 @@
+---
+- name: Configure Web Server Infrastructure
+  hosts: all
+  become: yes
+  vars:
+    # Allow overriding vars from inventory or command line
+    
+  roles:
+    - common
+
+- name: Configure Web Servers
+  hosts: webservers
+  become: yes
+  roles:
+    - webserver

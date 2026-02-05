@@ -1,0 +1,37 @@
+services:
+  web1:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: web1
+    ports:
+      - "9090:80"
+      - "8443:443"
+      - "2221:22"
+    networks:
+      - ansible-net
+
+  web2:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: web2
+    ports:
+      - "9091:80"
+      - "2222:22"
+    networks:
+      - ansible-net
+
+  db1:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: db1
+    ports:
+      - "2223:22"
+    networks:
+      - ansible-net
+
+networks:
+  ansible-net:
+    driver: bridge

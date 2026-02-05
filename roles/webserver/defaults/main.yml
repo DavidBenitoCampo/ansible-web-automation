@@ -1,0 +1,15 @@
+---
+app_name: "demo_app"
+app_user: "webadmin"
+app_group: "sudo"
+app_directory: "/opt/demo_app"
+document_root: "/var/www/demo_app"
+server_name: "localhost"
+
+ssl_cert_path: "/etc/ssl/certs"
+ssl_key_path: "/etc/ssl/private"
+ssl_cert_file: "server.crt"
+ssl_key_file: "server.key"
+
+# Set to true to force HTTP -> HTTPS redirect (default false for local demo)
+nginx_redirect_http_to_https: false
