@@ -54,7 +54,7 @@ ansible-web-automation/
 
 ---
 
-## 💻 How to Run (Demo)
+## 💻 How to Run
 
 Follow these steps to spin up the environment and run the automation locally.
 
